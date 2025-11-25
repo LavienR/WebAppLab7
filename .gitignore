@@ -1,0 +1,9 @@
+# ignore everything
+*
+
+# except src folder
+!src/
+!src/**
+
+# allow gitignore itself
+!.gitignore
