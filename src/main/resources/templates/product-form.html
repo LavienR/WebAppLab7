@@ -93,6 +93,9 @@
         display: flex;
         justify-content: center;
       }
+      .error { border-color: red; }
+.error-message { color: red; font-size: 12px; }
+
     </style>
   </head>
   <body>
@@ -107,16 +110,16 @@
         <!-- Hidden ID field for updates -->
         <input type="hidden" th:field="*{id}" />
 
-        <div class="form-group">
-          <label for="productCode">Product Code *</label>
-          <input
-            type="text"
-            id="productCode"
-            th:field="*{productCode}"
-            placeholder="Enter product code (e.g., P001)"
-            required
-          />
-        </div>
+         <div class="form-group">
+    <label for="productCode">Product Code *</label>
+    <input type="text" 
+           id="productCode" 
+           th:field="*{productCode}" 
+           th:errorclass="error" />
+    <span th:if="${#fields.hasErrors('productCode')}" 
+          th:errors="*{productCode}" 
+          class="error-message">Error</span>
+</div>
 
         <div class="form-group">
           <label for="name">Product Name *</label>
@@ -175,6 +178,8 @@
             placeholder="Enter product description (optional)"
           ></textarea>
         </div>
+       
+
 
         <div class="button-group">
           <button type="submit" class="btn btn-primary">💾 Save Product</button>

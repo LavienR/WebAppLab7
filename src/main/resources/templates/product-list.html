@@ -158,7 +158,7 @@
         <a th:href="@{/products/new}" class="btn btn-primary"
           >➕ Add New Product</a
         >
-
+<a th:href="@{/dashboard}" class="btn btn-primary">📊 Dashboard</a>
         <form th:action="@{/products/search}" method="get" class="search-form">
           <input
             type="text"
@@ -166,9 +166,60 @@
             th:value="${keyword}"
             placeholder="Search products..."
           />
+          <!--ex5.2-->
+          <!--With this new adjustment, the user interacts with this form, the browser will send-->
+          <!--two parameters: keyword and category to /products/search -->
+          <!--So /product/search should know how to handle category-->
+          <!--Make change in ProductController for search and advanced-search-->
+          <select name="category" onchange="this.form.submit()">
+    <option value="">All Categories</option>
+    <option th:each="cat : ${categories}" 
+            th:value="${cat}" 
+            th:text="${cat}"
+            th:selected="${cat == selectedCategory}">
+    </option>
+</select>
           <button type="submit" class="btn btn-primary">🔍 Search</button>
         </form>
       </div>
+
+      <!--ex 5.1-->
+      <!-- Advanced Search Form -->
+      <form
+        th:action="@{/products/advanced-search}"
+        method="get"
+        class="search-form"
+      >
+        <input
+          type="text"
+          name="name"
+          th:value="${name}"
+          placeholder="Product Name"
+        />
+        <input
+          type="text"
+          name="category"
+          th:value="${category}"
+          placeholder="Category"
+        />
+        <input
+          type="number"
+          step="0.01"
+          name="minPrice"
+          th:value="${minPrice}"
+          placeholder="Min Price"
+        />
+        <input
+          type="number"
+          step="0.01"
+          name="maxPrice"
+          th:value="${maxPrice}"
+          placeholder="Max Price"
+        />
+        <button type="submit" class="btn btn-primary">
+          🔍 Advanced Search
+        </button>
+      </form>
 
       <!-- Products Table -->
       <div th:if="${products != null and !products.isEmpty()}">
@@ -177,7 +228,13 @@
             <tr>
               <th>ID</th>
               <th>Code</th>
-              <th>Name</th>
+              <th>
+                <!--Update so when filter and sorting are chosen, it show both-->
+    <a th:href="@{/products(category=${selectedCategory},sortBy='name', sortDir=${sortBy == 'name' and sortDir == 'asc' ? 'desc' : 'asc'})}">
+        Name
+        <span th:if="${sortBy=='name'}" th:text="${sortDir=='asc'?'↑':'↓'}"></span>
+    </a>
+              </th>
               <th>Price</th>
               <th>Quantity</th>
               <th>Category</th>
@@ -216,6 +273,42 @@
           </tbody>
         </table>
       </div>
+      <!--ex5.3 Pagination Controls -->
+<div th:if="${products != null and !products.isEmpty() and totalPages > 1}" 
+     style="margin-top: 20px; text-align: center;">
+    
+    <!-- Previous Button -->
+    <a th:if="${currentPage > 0}"
+       th:href="@{/products/search(keyword=${keyword}, page=${currentPage - 1}, size=${pageSize})}"
+       class="btn btn-primary btn-sm">
+        ← Previous
+    </a>
+    
+    <!-- Page Info -->
+    <span style="margin: 0 15px; padding: 8px 15px; background: #f8f9fa; border-radius: 5px;">
+        Page <span th:text="${currentPage + 1}">1</span> of 
+        <span th:text="${totalPages}">1</span>
+        (<span th:text="${totalItems}">0</span> total products)
+    </span>
+    
+    <!-- Next Button -->
+    <a th:if="${currentPage < totalPages - 1}"
+       th:href="@{/products/search(keyword=${keyword}, page=${currentPage + 1}, size=${pageSize})}"
+       class="btn btn-primary btn-sm">
+        Next →
+    </a>
+    
+    <!-- Page Size Selector -->
+    <div style="margin-top: 10px;">
+        <label>Items per page: </label>
+        <select onchange="changePageSize(this.value)" style="padding: 5px; border: 1px solid #ddd; border-radius: 3px;">
+            <option value="5" th:selected="${pageSize == 5}">5</option>
+            <option value="10" th:selected="${pageSize == 10}">10</option>
+            <option value="20" th:selected="${pageSize == 20}">20</option>
+            <option value="50" th:selected="${pageSize == 50}">50</option>
+        </select>
+    </div>
+</div>
 
       <!-- Empty State -->
       <div
